@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="client.js"></script>
+
+    <script>
+        var rtcConnection = new RTCPeerConnection(configuration, {optional: [{
+            RtpDataChannels: true
+        }]});
+        var dataChannel;
+//        var dataChannel = rtcConnection.createDataChannel("channel1", {reliable:true});
+//        console.log(rtcConnection);
+//        console.log(dataChannel);
+//        dataChannel.onerror = function(err) {
+//            console.log(err);
+//        };
+
+
+//        dataChannel.onmessage = function(event) {
+//            console.log("msg",event.data);
+//        };
+
+//        rtcConnection.onicecandidate = function (event) {
+//            if (event.candidate) {
+//                console.log(event.candidate);
+//            }
+//        };
+
+//        rtcConnection.ondatachannel = function(event) {
+//            if(!(dataChannel != undefined)){
+//                console.log("fffffffffffffffffffffffffff");
+//                dataChannel = event.channel;
+//                dataChannel.onmessage = function(event) {
+//                    console.log("ondatachannel message:", event.data);
+//                };
+//                dataChannel.onerror = function (event) {
+//                    console.log(event);
+//                }
+//            }
+//
+//        };
+//        openDataChannel();
+
+        rtcConnection.onicecandidate = function (event) {
+            var candidate = event.candidate;
+            console.log(event);
+            console.log("candidate  ",candidate);
+        };
+
+        var peerRemote;
+        var socket = io('http://localhost:3001');
+        socket.on('test',function (data) {
+            socket.emit('1', "hello");
+           console.log(data.data);
+        });
+        var peerOffer;
+//        var peerCandidate;
+        socket.on('offerPeer', function (data) {
+            console.log(data);
+            peerOffer = data.offer;
+            //peerCandidate = data.candidate;
+            console.log("da nhan peer offer:",peerOffer);
+        });
+
+        socket.on('myOffer', function (data) {
+            peerRemote = data.data;
+            console.log("da nhan peer remote");
+            console.log(peerRemote);
+          // connectPeer(data.data);
+        });
+
+
+
+
+    </script>
+</head>
+<body>
+<button id="call" onclick="callServer()">A1</button>
+<button id="setPeerRemote" onclick="receiveOffer()">B1</button>
+<button id="sendMessage" onclick="connectPeer()">A1</button>
+</body>
+</html>
